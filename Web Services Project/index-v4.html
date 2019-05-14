@@ -1,0 +1,295 @@
+<!doctype html>
+<!--
+  Material Design Lite
+  Copyright 2015 Google Inc. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+      https://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License
+-->
+<html lang="en">
+  <head>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.blue-red.min.css" />
+	<script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+
+	<meta name="viewport" content="initial-scale=1.0">
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>Web Services Project</title>
+
+    <!-- Add to homescreen for Chrome on Android -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="images/android-desktop.png">
+
+    <!-- Add to homescreen for Safari on iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Material Design Lite">
+    <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
+
+    <!-- Tile icon for Win8 (144x144 + tile color) -->
+    <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+    <meta name="msapplication-TileColor" content="#3372DF">
+
+    <link rel="shortcut icon" href="images/favicon.png">
+
+    <!-- SEO: If your mobile URL is different from the desktop URL, add a canonical link to the desktop page https://developers.google.com/webmasters/smartphone-sites/feature-phones -->
+    <!-- <link rel="canonical" href="http://www.example.com/"> -->
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+		#view-source {
+		  position: fixed;
+		  display: block;
+		  right: 0;
+		  bottom: 0;
+		  margin-right: 40px;
+		  margin-bottom: 40px;
+		  z-index: 900;
+		}
+    </style>
+	<style>
+		/* Always set the map height explicitly to define the size of the div
+		 * element that contains the map. */
+		#map {
+			height: 100%;
+		}
+		/* Optional: Makes the sample page fill the window. */
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+    </style>
+
+	<!-- Uses a header that contracts as the page scrolls down. -->
+	<style>
+		.demo-layout-waterfall .mdl-layout__header-row .mdl-navigation__link:last-of-type  {
+		  padding-right: 0;
+		}
+	</style>
+  </head>
+  <body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+        <!-- <div class="mdl-layout--large-screen-only mdl-layout__header-row"></div> -->
+        <div class="mdl-layout--large-screen-only mdl-layout__header-row">
+          <h3>Web Services Project</h3>
+        </div>
+        <!-- <div class="mdl-layout--large-screen-only mdl-layout__header-row"> -->
+        <div class="mdl-layout__tab-bar mdl-js-ripple-effect mdl-color--primary-dark">
+			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+			  <input class="mdl-textfield__input" type="text" id="keywordsInput" >
+			  <label class="mdl-textfield__label">Keywords</label>
+			</div>
+			<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+			  <input class="mdl-textfield__input" type="number" id="rangeInput" >
+			  <label class="mdl-textfield__label">Within range (miles)</label>
+			</div>
+			<div class="mdl-tooltip mdl-tooltip--large" for="rangeInput">Default 25 miles</div>
+
+		  <div class="demo-avatar-dropdown">
+			<p id="jobTypeLabel">Full Time</p>
+			<ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" id="jt_selector" for="job_types">
+			  <li class="mdl-menu__item">Full Time</li>
+			  <li class="mdl-menu__item">Part Time</li>
+			  <li class="mdl-menu__item">Contract</li>
+			  <li class="mdl-menu__item">Internship</li>
+			  <li class="mdl-menu__item">Temporary</li>
+			</ul>
+		  </div>
+		  <button id="job_types" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
+			  <i class="material-icons" role="presentation">arrow_drop_down</i>
+			  <span class="visuallyhidden">Job-Type</span>
+			</button>
+		  <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored mdl-shadow--4dp mdl-color--accent" id="search" onclick="findJobs()">
+			<i class="material-icons" role="presentation">search</i>
+			<span class="visuallyhidden">Search</span>
+		  </button>
+        </div>
+      </header>
+	  <div id="map"></div>
+    <script>
+      var geo_zip;
+      var geo_lat;
+      var geo_lng;
+      var myResponse = "";
+      var map;
+      var myHouse = {lat: 47.3078, lng: -122.2643};
+      //var myHouse = {lat: geo_lat, lng: geo_lng};
+      var myMarkers = [];
+      var openInfoWindow = null;
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: myHouse,
+          zoom: 10,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        ////////
+        var infoWindow = new google.maps.InfoWindow;
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+          //The lat and lng of current location
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          infoWindow.setPosition(pos);
+          infoWindow.setContent('Current Location found.');
+          infoWindow.open(map);
+          map.setCenter(pos);
+          }, function() {
+            handleLocationError(true, infoWindow);
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow);
+        }
+		
+		google.maps.event.addListener(map, "click", function(event) {
+			infoWindow.close();
+			openInfoWindow.close();
+			openInfoWindow = null;
+		});
+		
+		document.getElementById("jt_selector")
+            .addEventListener("click", function(event) {
+              var elem = event.target.innerHTML;
+              document.getElementById("jobTypeLabel").innerHTML = elem.toString();
+        });
+		
+		document.getElementById("keywordsInput")
+		.addEventListener("keyup", function(event) {
+		  event.preventDefault();
+		  if (event.keyCode === 13) {
+			findJobs();
+			getZip();
+			document.getElementById("search").click();
+		  }
+        });
+      }
+	  
+	    function IP(json) {
+        geo_zip = JSON.stringify(json.zip);
+        geo_lat = JSON.parse(json.lat);
+        geo_lng = JSON.parse(json.lon);
+        document.write("My Zip Code is: " + geo_zip + " " + geo_lat + ", " + geo_lng);
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow) {
+        var error_pos = {lat: geo_lat, lng: geo_lng};
+        infoWindow.setPosition(error_pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                    'Your current location':
+                    'Error: Your browser doesn\'t support geolocation.');
+        infoWindow.open(map);
+      }
+
+      function findJobs() {
+      //Just output for 250 results
+        removeExistingMarkers();
+        for (var i = 0; i < 10; i++) {
+          find25Jobs(i);
+        }
+      }
+      function find25Jobs(start) {
+        var jt = document.getElementById("jobTypeLabel").innerHTML.toString().toLowerCase().replace(/\s/g, "");
+        if(jt.includes("<")) {
+          jt = jt.substring(0, jt.indexOf("<"));
+        }
+        var zipCode = JSON.parse(geo_zip);
+
+        var settings = {
+          "async": true,
+          "crossDomain": true,
+          /*
+          parameters:
+          l: location, Use a postal code or a "city, state/province/region" combination.
+          limit: Maximum number of results returned per query.
+          radius: Maximum number of results returned per query.
+          latlong: If latlong=1, returns latitude and longitude information for each job result.
+          */
+          "url": "https://indeed-indeed.p.mashape.com/apisearch?publisher=4665604319447589"
+                    + "&format=json&v=2&latlong=1"
+                    + "&l=" + zipCode
+                    + "&q="	+ document.getElementById("keywordsInput").value
+                    + "&jt=" + jt
+                    + "&radius=" + document.getElementById("rangeInput").value
+                    + "&limit=25"
+                    + "&start=" + start * 25,
+                    //+ "&limit=" + document.getElementById("limitInput").value,
+          "method": "GET",
+          "headers": {
+          "X-Mashape-Key": "UVlf4guEQ7mshf0ylS9SRPRuXMXFp1Xyvwfjsn7f8yPXmrqLxb",
+          "Accept": "application/json",
+          "Cache-Control": "no-cache",
+          "Postman-Token": "04994093-9bf4-454a-820f-121cdbc6234a"
+          }
+        }
+        //alert(settings.url);
+
+        $.ajax(settings).done(function (response) {
+          console.log(response);
+          myResponse = JSON.stringify(response);
+          addMarkers();
+        });
+      }
+      
+      function addMarkers() {
+      //removeExistingMarkers();
+        var jsonData = JSON.parse(myResponse);
+        var jobsArray = jsonData.results;
+        for(i = 0; i < jobsArray.length; i++) {
+          var theJob = jobsArray[i];
+          var marker = new google.maps.Marker({
+            position: {lat: theJob.latitude, lng: theJob.longitude},
+            map: map,
+            title: theJob.jobtitle,
+          });
+          var infowindow = new google.maps.InfoWindow({
+          content: "<div><h4>" + theJob.jobtitle + "</h4><p><b>" + theJob.company + "</b></p><p>" + theJob.snippet + "</p><a href=" + theJob.url + " target='_blank'>Learn more and apply here</a></div>"
+          });
+
+          marker.infowindow = infowindow;
+          marker.addListener('click', function() {
+            if(openInfoWindow != null) {
+              openInfoWindow.close();
+            }
+            openInfoWindow = this.infowindow;
+            return this.infowindow.open(map, this);
+          });
+          myMarkers[myMarkers.length] = marker;
+        }
+      }
+      
+      function removeExistingMarkers() {
+        for (var i = 0; i < myMarkers.length; i++ ) {
+        myMarkers[i].setMap(null);
+        }
+        myMarkers.length = 0;
+      }
+      
+      
+
+
+	   </script>
+     <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+	   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAaHkcFlz58qnRTztp434lmkomx0vWzIDA&callback=initMap" async defer></script>
+	   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+     <script type="application/javascript" src="http://ip-api.com/json/?callback=IP"></script>
+    </div>
+  </body>
+</html>
